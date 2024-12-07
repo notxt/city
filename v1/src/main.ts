@@ -32,30 +32,38 @@ const createPixel = (): Pixel => {
   return pixel;
 };
 
-const pixels: Pixel[][] = [];
-for (let y = 0; y < height / size; y++) {
-  const row: Pixel[] = [];
-  for (let x = 0; x < width / size; x++) {
-    row.push(createPixel());
-  }
-  pixels.push(row);
-}
-
-console.log(pixels);
-
 const ctx = canvas.getContext("2d");
 if (ctx === null) throw new Error("ctx is null");
 
-for (let y = 0; y < height / size; y++) {
-  const row = pixels[y];
-  if (typeof row === "undefined") throw new Error("row is undefined");
+let frame = 0;
+const draw = () => {
+  frame++;
+  requestAnimationFrame(() => draw());
 
-  for (let x = 0; x < width / size; x++) {
-    const pixel = row[x];
-    if (typeof pixel === "undefined") throw new Error("pixel is undefined");
+  if (frame % 8 !== 0) return;
 
-    ctx.fillStyle = `rgb(${pixel.r} ${pixel.g} ${pixel.b})`;
-
-    ctx.fillRect(x * size, y * size, size, size);
+  const pixels: Pixel[][] = [];
+  for (let y = 0; y < height / size; y++) {
+    const row: Pixel[] = [];
+    for (let x = 0; x < width / size; x++) {
+      row.push(createPixel());
+    }
+    pixels.push(row);
   }
-}
+
+  for (let y = 0; y < height / size; y++) {
+    const row = pixels[y];
+    if (typeof row === "undefined") throw new Error("row is undefined");
+
+    for (let x = 0; x < width / size; x++) {
+      const pixel = row[x];
+      if (typeof pixel === "undefined") throw new Error("pixel is undefined");
+
+      ctx.fillStyle = `rgb(${pixel.r} ${pixel.g} ${pixel.b})`;
+
+      ctx.fillRect(x * size, y * size, size, size);
+    }
+  }
+};
+
+requestAnimationFrame(() => draw());
