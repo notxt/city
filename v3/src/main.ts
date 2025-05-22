@@ -46,7 +46,7 @@ const createPos = (): Position => {
 };
 
 const agentSize = 2;
-const agentCount = 1000;
+const agentCount = 10_000;
 
 const placeNames = ["home", "work"] as const;
 type PlaceName = (typeof placeNames)[number];
@@ -66,7 +66,7 @@ const createDest = (place: PlaceName): Destination => {
 };
 
 const createWorkplace = (): Destination => createDest("work");
-const workplaceCount = 3;
+const workplaceCount = 5;
 const workplaces: Destination[] = [];
 for (let i = 0; i < workplaceCount; i++) workplaces.push(createWorkplace());
 const getWorkplace = (): Destination => {
@@ -181,7 +181,7 @@ const draw = () => {
   frame++;
   requestAnimationFrame(() => draw());
 
-  if (frame % 2 !== 0) return;
+  if (frame % 3 !== 0) return;
 
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvasSize, canvasSize);

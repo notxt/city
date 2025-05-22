@@ -40,7 +40,7 @@ const draw = () => {
   frame++;
   requestAnimationFrame(() => draw());
 
-  if (frame % 8 !== 0) return;
+  if (frame % 6 !== 0) return;
 
   const pixels: Pixel[][] = [];
   for (let y = 0; y < height / size; y++) {

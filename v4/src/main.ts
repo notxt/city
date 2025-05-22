@@ -46,7 +46,7 @@ const createPos = (): Position => {
 };
 
 const agentSize = 2;
-const agentCount = 1000;
+const agentCount = 1_000;
 
 const placeNames = ["home", "work"] as const;
 type PlaceName = (typeof placeNames)[number];
@@ -104,6 +104,7 @@ type Agent = {
   pos: Position;
   dest: Destination;
   place: PlaceMap;
+  stopped: boolean;
 };
 
 const createAgent = (): Agent => {
@@ -113,6 +114,7 @@ const createAgent = (): Agent => {
     color: createColor(),
     pos: createPos(),
     dest: startingDest(place),
+    stopped: false,
     place,
   };
 
@@ -131,7 +133,7 @@ const getDirection = (): Direction => {
   return direction;
 };
 
-const updateAgentPosition = (agent: Agent) => {
+const updateAgentPositionFactory = (nextMove: any) => (agent: Agent) => {
   const { dest, pos } = agent;
 
   if (dest.pos.x === pos.x && dest.pos.y === pos.y) {
@@ -156,8 +158,18 @@ const updateAgentPosition = (agent: Agent) => {
   if (abs(dest.pos.x - left) < abs(dest.pos.x - x)) x = left;
   if (abs(dest.pos.x - right) < abs(dest.pos.x - x)) x = right;
 
+  const open = nextMove[y][x];
+  if (!open) {
+    console.log("not open");
+    agent.stopped = true;
+    return;
+  }
+
+  nextMove[pos.y][pos.x] = true;
+  nextMove[y][x] = false;
   agent.pos.x = x;
   agent.pos.y = y;
+  agent.stopped = false;
 };
 
 const agents: Agent[] = [];
@@ -167,8 +179,14 @@ for (let i = 0; i < agentCount; i++) {
 
 const drawAgentFactory = (ctx: CanvasRenderingContext2D) => (agent: Agent) => {
   const { color, pos: position } = agent;
+
   ctx.fillStyle = `rgb(${color.r} ${color.g} ${color.b})`;
-  ctx.fillRect(position.x, position.y, agentSize, agentSize);
+  let size = agentSize;
+  // if (agent.stopped === true) {
+  //   ctx.fillStyle = "white";
+  //   size = 10;
+  // }
+  ctx.fillRect(position.x, position.y, size, size);
 };
 
 const ctx = canvas.getContext("2d");
@@ -185,6 +203,21 @@ const draw = () => {
 
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+  const nextMove: any = [];
+  for (let i = 0; i < canvasSize; i++) {
+    const row: boolean[] = [];
+    for (let j = 0; j < canvasSize; j++) {
+      row.push(true);
+    }
+    nextMove.push(row);
+  }
+
+  agents.forEach((agent) => {
+    nextMove[agent.pos.y][agent.pos.x] = false;
+  });
+
+  const updateAgentPosition = updateAgentPositionFactory(nextMove);
 
   agents.forEach(drawAgent);
   agents.forEach(updateAgentPosition);

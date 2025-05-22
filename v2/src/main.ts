@@ -82,18 +82,22 @@ const updateAgentPosition = (agent: Agent) => {
     case "down":
       if (position.previous === "up") break;
       position.y++;
+      agent.position.previous = "down";
       break;
     case "left":
       if (position.previous === "right") break;
       position.x--;
+      agent.position.previous = "left";
       break;
     case "right":
       if (position.previous === "left") break;
       position.x++;
+      agent.position.previous = "right";
       break;
     case "up":
       if (position.previous === "down") break;
       position.y--;
+      agent.position.previous = "up";
       break;
   }
 };
